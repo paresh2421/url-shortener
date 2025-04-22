@@ -18,5 +18,16 @@ const shortenUrl = async (req, res) => {
   res.status(StatusCodes.CREATED).json({ shortenedUrl: newUrl })
 }
 
-const redirectUrl = async (req, res) => {}
+const redirectUrl = async (req, res) => {
+  const { code } = req.params
+
+  const realUrl = await url.findOne({ shortCode: code })
+
+  if(realUrl){
+    return res.redirect(realUrl.originalUrl)
+  }else{
+    res.status(404).json({ message: 'short url not found'})
+  }
+
+}
 export { shortenUrl, redirectUrl }
