@@ -4,22 +4,24 @@ import { StatusCodes } from 'http-status-codes'
 import { NotFoundError } from '../errors/index.js'
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000'
 
-const shortenUrl = async (req, res) => {
-  console.log(req.body)
-  const { originalUrl } = req.body
+const shortenUrl =async (req, res) => {
+  const { originalUrl } = req.body;
+  if (!originalUrl) return res.status(400).json({ message: 'URL is required' });
 
-  const shortCode = nanoid(6)
+  const shortCode = nanoid(6);
+  const shortUrl = `${BASE_URL}/${shortCode}`;
 
-  if (!originalUrl) return res.status(StatusCodes.BAD_REQUEST).json({ message: 'url is required' })
-
-  const shortUrl = `${BASE_URL}/${shortCode}`
-
-  const newUrl = await url.create({ originalUrl, shortCode })
-  res.status(StatusCodes.CREATED).json({ shortenedUrl: newUrl })
+  try {
+    const newUrl = new url({ originalUrl, shortCode });
+    await newUrl.save();
+    res.json({ shortUrl });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 }
-
 const redirectUrl = async (req, res) => {
-  const { code } = req.params
+  const { code: code } = req.params;  
+  
 try {  
   const realUrl = await url.findOne({ shortCode: code })
 
@@ -39,4 +41,4 @@ try {
 }
 
 }
-export { shortenUrl, redirectUrl }
+export { shortenUrl, redirectUrl}

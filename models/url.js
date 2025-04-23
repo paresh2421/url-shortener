@@ -5,7 +5,7 @@ const urlSchema = new mongoose.Schema({
     type: String,
     required: [true, 'A url must be provided'],
   },
-  shortcode: {
+  shortCode: {
     type: String,
     required: [true, 'A shortcode is required'],
     unique: true,
